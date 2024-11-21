@@ -4,6 +4,33 @@ if (!isset($_SESSION['nombre'])) {
     header("Location: login.html");
     exit();
 }
+
+include_once 'conexion.php';
+
+$database = new Database();
+$db = $database->getConnection();
+
+$query = "SELECT idusuarios FROM usuarios WHERE nombre = :nombre";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':nombre', $_SESSION['nombre']);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$idusuario = $user['idusuarios'];
+
+$query = "SELECT nombre, duracion, tipo, limite, completado FROM tarea WHERE idusuario = :idusuario";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':idusuario', $idusuario);
+$stmt->execute();
+$tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$tasks_by_day = [];
+foreach ($tareas as $tarea) {
+    $day = (int)$tarea['limite'];
+    if (!isset($tasks_by_day[$day])) {
+        $tasks_by_day[$day] = [];
+    }
+    $tasks_by_day[$day][] = $tarea;
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +39,7 @@ if (!isset($_SESSION['nombre'])) {
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Index - QuickStart Bootstrap Template</title>
+  <title>Agenda - QuickStart Bootstrap Template</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -23,7 +50,7 @@ if (!isset($_SESSION['nombre'])) {
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -35,13 +62,38 @@ if (!isset($_SESSION['nombre'])) {
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: QuickStart
-  * Template URL: https://bootstrapmade.com/quickstart-bootstrap-startup-website-template/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+    .agenda-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .agenda-table th, .agenda-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .agenda-table th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
+    .agenda-table td {
+      height: 100px;
+    }
+    .task {
+      margin: 5px 0;
+      padding: 5px;
+      border-radius: 5px;
+    }
+    .task.completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .task.pending {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -89,111 +141,47 @@ if (!isset($_SESSION['nombre'])) {
 
   <main class="main">
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero section">
-      <div class="hero-bg">
-        <img src="assets/img/hero-bg-light.webp" alt="">
-      </div>
-      <div class="container text-center">
-        <div class="d-flex flex-column justify-content-center align-items-center">
-          <h1 data-aos="fade-up">Bienvenido a <span>LifeSync</span>, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
-          <p data-aos="fade-up" data-aos-delay="100">Organiza tus horarios de la mejor manera<br></p>
-          <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
-            <a href="#about" class="btn-get-started">Comienza</a>
-            <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Ver Video</span></a>
-          </div>
-          <img src="assets/img/hero-services-img.webp" class="img-fluid hero-img" alt="" data-aos="zoom-out" data-aos-delay="300">
-        </div>
-      </div>
-
-    </section><!-- /Hero Section -->
-
-
-
-    <!-- Services Section -->
-    <section id="services" class="services section light-background">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Servicios</h2>
-        <p>Descubre los servicios a los que tienes acceso como miembro</p>
-      </div><!-- End Section Title -->
-
+    <!-- Agenda Section -->
+    <section id="agenda" class="agenda section">
       <div class="container">
-
-        <div class="row g-5">
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="service-item item-cyan position-relative">
-              <i class="bi bi-activity icon"></i>
-              <div>
-                <h3>Gestor de Tareas</h3>
-                <p>Aquí podrás añadir nuevas tareas, eliminarlas y llevar un control de las mismas!</p>
-                <a href="tareas.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item item-orange position-relative">
-              <i class="bi bi-broadcast icon"></i>
-              <div>
-                <h3>Distribución de tareas</h3>
-                <p>Dentro de este apartado, visualizarás analiticas acerca de tus tareas</p>
-                <a href="distribucion.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="service-item item-teal position-relative">
-              <i class="bi bi-easel icon"></i>
-              <div>
-                <h3>Agenda</h3>
-                <p>De una manera más visual, consulta tus actividades en un mapa mensual!</p>
-                <a href="agenda.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-            <div class="service-item item-red position-relative">
-              <i class="bi bi-bounding-box-circles icon"></i>
-              <div>
-                <h3>Asperiores Commodi</h3>
-                <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
-                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
-            <div class="service-item item-indigo position-relative">
-              <i class="bi bi-calendar4-week icon"></i>
-              <div>
-                <h3>Velit Doloremque.</h3>
-                <p>Cumque et suscipit saepe. Est maiores autem enim facilis ut aut ipsam corporis aut. Sed animi at autem alias eius labore.</p>
-                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
-            <div class="service-item item-pink position-relative">
-              <i class="bi bi-chat-square-text icon"></i>
-              <div>
-                <h3>Dolori Architecto</h3>
-                <p>Hic molestias ea quibusdam eos. Fugiat enim doloremque aut neque non et debitis iure. Corrupti recusandae ducimus enim.</p>
-                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-        </div>
-
+        <h2 class="text-center">Agenda</h2>
+        <table class="agenda-table">
+          <thead>
+            <tr>
+              <th>Lunes</th>
+              <th>Martes</th>
+              <th>Miércoles</th>
+              <th>Jueves</th>
+              <th>Viernes</th>
+              <th>Sábado</th>
+              <th>Domingo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php for ($i = 0; $i < 30; $i++): ?>
+              <?php if ($i % 7 == 0): ?>
+                <tr>
+              <?php endif; ?>
+              <td>
+                <strong><?php echo $i + 1; ?></strong>
+                <?php if (isset($tasks_by_day[$i + 1])): ?>
+                  <?php foreach ($tasks_by_day[$i + 1] as $task): ?>
+                    <div class="task <?php echo $task['completado'] ? 'completed' : 'pending'; ?>">
+                      <strong><?php echo htmlspecialchars($task['nombre']); ?></strong><br>
+                      Duración: <?php echo htmlspecialchars($task['duracion']); ?> minutos<br>
+                      Tipo: <?php echo htmlspecialchars($task['tipo']); ?>
+                    </div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </td>
+              <?php if ($i % 7 == 6): ?>
+                </tr>
+              <?php endif; ?>
+            <?php endfor; ?>
+          </tbody>
+        </table>
       </div>
-
-    </section><!-- /Services Section -->
+    </section><!-- /Agenda Section -->
 
   </main>
 

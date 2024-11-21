@@ -4,6 +4,42 @@ if (!isset($_SESSION['nombre'])) {
     header("Location: login.html");
     exit();
 }
+
+include_once 'conexion.php';
+
+$database = new Database();
+$db = $database->getConnection();
+
+$query = "SELECT idusuarios FROM usuarios WHERE nombre = :nombre";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':nombre', $_SESSION['nombre']);
+$stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$idusuario = $user['idusuarios'];
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['completar_tarea'])) {
+        $idtarea = htmlspecialchars(strip_tags($_POST['idtarea']));
+        $query = "UPDATE tarea SET completado = 1 WHERE idtarea = :idtarea AND idusuario = :idusuario";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':idtarea', $idtarea);
+        $stmt->bindParam(':idusuario', $idusuario);
+        $stmt->execute();
+    } elseif (isset($_POST['eliminar_tarea'])) {
+        $idtarea = htmlspecialchars(strip_tags($_POST['idtarea']));
+        $query = "DELETE FROM tarea WHERE idtarea = :idtarea AND idusuario = :idusuario";
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(':idtarea', $idtarea);
+        $stmt->bindParam(':idusuario', $idusuario);
+        $stmt->execute();
+    }
+}
+
+$query = "SELECT * FROM tarea WHERE idusuario = :idusuario";
+$stmt = $db->prepare($query);
+$stmt->bindParam(':idusuario', $idusuario);
+$stmt->execute();
+$tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +48,7 @@ if (!isset($_SESSION['nombre'])) {
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Index - QuickStart Bootstrap Template</title>
+  <title>Mis Tareas - QuickStart Bootstrap Template</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -23,7 +59,7 @@ if (!isset($_SESSION['nombre'])) {
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -35,13 +71,72 @@ if (!isset($_SESSION['nombre'])) {
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: QuickStart
-  * Template URL: https://bootstrapmade.com/quickstart-bootstrap-startup-website-template/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  <style>
+    .listar-tareas {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 50px 0;
+    }
+    .listar-tareas .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .listar-tareas h2 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+    }
+    .listar-tareas table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .listar-tareas th, .listar-tareas td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    .listar-tareas th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+    .listar-tareas tr:hover {
+      background-color: #f1f1f1;
+    }
+    .listar-tareas .btn-completar, .listar-tareas .btn-eliminar {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .listar-tareas .btn-completar:hover, .listar-tareas .btn-eliminar:hover {
+      background-color: #218838;
+    }
+    .listar-tareas .btn-eliminar {
+      background-color: #dc3545;
+    }
+    .listar-tareas .btn-eliminar:hover {
+      background-color: #c82333;
+    }
+    .btn-crear-tarea {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .btn-crear-tarea:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -89,111 +184,51 @@ if (!isset($_SESSION['nombre'])) {
 
   <main class="main">
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero section">
-      <div class="hero-bg">
-        <img src="assets/img/hero-bg-light.webp" alt="">
-      </div>
-      <div class="container text-center">
-        <div class="d-flex flex-column justify-content-center align-items-center">
-          <h1 data-aos="fade-up">Bienvenido a <span>LifeSync</span>, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
-          <p data-aos="fade-up" data-aos-delay="100">Organiza tus horarios de la mejor manera<br></p>
-          <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
-            <a href="#about" class="btn-get-started">Comienza</a>
-            <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Ver Video</span></a>
-          </div>
-          <img src="assets/img/hero-services-img.webp" class="img-fluid hero-img" alt="" data-aos="zoom-out" data-aos-delay="300">
-        </div>
-      </div>
-
-    </section><!-- /Hero Section -->
-
-
-
-    <!-- Services Section -->
-    <section id="services" class="services section light-background">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Servicios</h2>
-        <p>Descubre los servicios a los que tienes acceso como miembro</p>
-      </div><!-- End Section Title -->
-
+    <!-- Listar Tareas Section -->
+    <section id="listar-tareas" class="listar-tareas section">
       <div class="container">
-
-        <div class="row g-5">
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-            <div class="service-item item-cyan position-relative">
-              <i class="bi bi-activity icon"></i>
-              <div>
-                <h3>Gestor de Tareas</h3>
-                <p>Aquí podrás añadir nuevas tareas, eliminarlas y llevar un control de las mismas!</p>
-                <a href="tareas.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="service-item item-orange position-relative">
-              <i class="bi bi-broadcast icon"></i>
-              <div>
-                <h3>Distribución de tareas</h3>
-                <p>Dentro de este apartado, visualizarás analiticas acerca de tus tareas</p>
-                <a href="distribucion.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="service-item item-teal position-relative">
-              <i class="bi bi-easel icon"></i>
-              <div>
-                <h3>Agenda</h3>
-                <p>De una manera más visual, consulta tus actividades en un mapa mensual!</p>
-                <a href="agenda.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
-            <div class="service-item item-red position-relative">
-              <i class="bi bi-bounding-box-circles icon"></i>
-              <div>
-                <h3>Asperiores Commodi</h3>
-                <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
-                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
-            <div class="service-item item-indigo position-relative">
-              <i class="bi bi-calendar4-week icon"></i>
-              <div>
-                <h3>Velit Doloremque.</h3>
-                <p>Cumque et suscipit saepe. Est maiores autem enim facilis ut aut ipsam corporis aut. Sed animi at autem alias eius labore.</p>
-                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
-            <div class="service-item item-pink position-relative">
-              <i class="bi bi-chat-square-text icon"></i>
-              <div>
-                <h3>Dolori Architecto</h3>
-                <p>Hic molestias ea quibusdam eos. Fugiat enim doloremque aut neque non et debitis iure. Corrupti recusandae ducimus enim.</p>
-                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
-              </div>
-            </div>
-          </div><!-- End Service Item -->
-
+        <h2 class="text-center">Mis Tareas</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Duración (minutos)</th>
+              <th>Tipo</th>
+              <th>Límite</th>
+              <th>Completado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($tareas as $tarea): ?>
+              <tr>
+                <td><?php echo htmlspecialchars($tarea['nombre']); ?></td>
+                <td><?php echo htmlspecialchars($tarea['duracion']); ?></td>
+                <td><?php echo htmlspecialchars($tarea['tipo']); ?></td>
+                <td><?php echo htmlspecialchars($tarea['limite']); ?></td>
+                <td><?php echo $tarea['completado'] ? 'Sí' : 'No'; ?></td>
+                <td>
+                  <?php if (!$tarea['completado']): ?>
+                    <form action="tareas.php" method="post" style="display:inline;">
+                      <input type="hidden" name="idtarea" value="<?php echo $tarea['idtarea']; ?>">
+                      <button type="submit" name="completar_tarea" class="btn-completar">Marcar como completado</button>
+                    </form>
+                  <?php else: ?>
+                    <form action="tareas.php" method="post" style="display:inline;">
+                      <input type="hidden" name="idtarea" value="<?php echo $tarea['idtarea']; ?>">
+                      <button type="submit" name="eliminar_tarea" class="btn-eliminar">Eliminar</button>
+                    </form>
+                  <?php endif; ?>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+        <div class="text-center">
+          <a href="creartarea.php" class="btn-crear-tarea">Crear Tarea</a>
         </div>
-
       </div>
-
-    </section><!-- /Services Section -->
+    </section><!-- /Listar Tareas Section -->
 
   </main>
 
