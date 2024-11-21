@@ -43,6 +43,7 @@ foreach ($tareas as $tarea) {
 
 $other_minutes = $total_minutes - $sleep_minutes - $task_minutes;
 $completed_percentage = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 100 : 0;
+$average_task_time = $total_tasks > 0 ? $task_minutes / $total_tasks : 0;
 ?>
 
 <!DOCTYPE html>
@@ -118,7 +119,7 @@ $completed_percentage = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 1
 
 <body class="index-page">
 
-  <header id="header" class="header d-flex align-items-center fixed-top">
+<header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
       <a href="index_li.php" class="logo d-flex align-items-center me-auto">
@@ -128,29 +129,8 @@ $completed_percentage = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 1
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.html#hero" class="active">Inicio</a></li>
-          <li><a href="index.html#about">Acerca de</a></li>
-          <li><a href="index.html#features">Productos</a></li>
-          <li><a href="index.html#services">Servicios</a></li>
-          <li><a href="index.html#pricing">Paquetes</a></li>
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
-          <li><a href="index.html#contact">Contacto</a></li>
+          <li><a href="index_li.php#hero" class="active">Inicio</a></li>
+          <li><a href="index_li.php#services">Servicios</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -180,6 +160,10 @@ $completed_percentage = $total_tasks > 0 ? ($completed_tasks / $total_tasks) * 1
         </div>
         <div class="category-chart-container">
           <canvas id="categoryDistributionChart"></canvas>
+        </div>
+        <div class="percentage-container">
+          <h3>Tiempo Promedio por Tarea</h3>
+          <p><?php echo number_format($average_task_time, 2); ?> minutos</p>
         </div>
       </div>
     </section><!-- /Distribución Section -->

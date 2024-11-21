@@ -56,29 +56,8 @@ if (!isset($_SESSION['nombre'])) {
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.html#hero" class="active">Inicio</a></li>
-          <li><a href="index.html#about">Acerca de</a></li>
-          <li><a href="index.html#features">Productos</a></li>
-          <li><a href="index.html#services">Servicios</a></li>
-          <li><a href="index.html#pricing">Paquetes</a></li>
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
-          <li><a href="index.html#contact">Contacto</a></li>
+          <li><a href="index_li.php#hero" class="active">Inicio</a></li>
+          <li><a href="index_li.php#services">Servicios</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -100,7 +79,7 @@ if (!isset($_SESSION['nombre'])) {
           <p data-aos="fade-up" data-aos-delay="100">Organiza tus horarios de la mejor manera<br></p>
           <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
             <a href="#about" class="btn-get-started">Comienza</a>
-            <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Ver Video</span></a>
+            <a href="https://www.youtube.com/watch?v=oFzXfi9IGWw" class="glightbox btn-watch-video d-flex align-items-center"><i class="bi bi-play-circle"></i><span>Ver Video</span></a>
           </div>
           <img src="assets/img/hero-services-img.webp" class="img-fluid hero-img" alt="" data-aos="zoom-out" data-aos-delay="300">
         </div>
@@ -129,7 +108,7 @@ if (!isset($_SESSION['nombre'])) {
               <div>
                 <h3>Gestor de Tareas</h3>
                 <p>Aquí podrás añadir nuevas tareas, eliminarlas y llevar un control de las mismas!</p>
-                <a href="tareas.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+                <a href="tareas.php" class="read-more stretched-link">Llevame ahí <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Item -->
@@ -140,18 +119,18 @@ if (!isset($_SESSION['nombre'])) {
               <div>
                 <h3>Distribución de tareas</h3>
                 <p>Dentro de este apartado, visualizarás analiticas acerca de tus tareas</p>
-                <a href="distribucion.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+                <a href="distribucion.php" class="read-more stretched-link">LLevame ahí <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Item -->
 
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
             <div class="service-item item-teal position-relative">
-              <i class="bi bi-easel icon"></i>
+              <i class="bi bi-calendar4-week icon"></i>
               <div>
                 <h3>Agenda</h3>
                 <p>De una manera más visual, consulta tus actividades en un mapa mensual!</p>
-                <a href="agenda.php" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+                <a href="agenda.php" class="read-more stretched-link">Llevame ahí <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Item -->
@@ -160,16 +139,16 @@ if (!isset($_SESSION['nombre'])) {
             <div class="service-item item-red position-relative">
               <i class="bi bi-bounding-box-circles icon"></i>
               <div>
-                <h3>Asperiores Commodi</h3>
-                <p>Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.</p>
-                <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
+                <h3>Especialistas</h3>
+                <p>Obten consejos y recomendaciones de especialistas en la materia</p>
+                <a href="especialistas.php" class="read-more stretched-link">LLevame ahí <i class="bi bi-arrow-right"></i></a>
               </div>
             </div>
           </div><!-- End Service Item -->
 
           <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
             <div class="service-item item-indigo position-relative">
-              <i class="bi bi-calendar4-week icon"></i>
+              <i class="bi bi-easel icon"></i>
               <div>
                 <h3>Velit Doloremque.</h3>
                 <p>Cumque et suscipit saepe. Est maiores autem enim facilis ut aut ipsam corporis aut. Sed animi at autem alias eius labore.</p>

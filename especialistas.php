@@ -5,41 +5,9 @@ if (!isset($_SESSION['nombre'])) {
     exit();
 }
 
-include_once 'conexion.php';
-
-$database = new Database();
-$db = $database->getConnection();
-
-$query = "SELECT idusuarios FROM usuarios WHERE nombre = :nombre";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':nombre', $_SESSION['nombre']);
-$stmt->execute();
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-$idusuario = $user['idusuarios'];
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['completar_tarea'])) {
-        $idtarea = htmlspecialchars(strip_tags($_POST['idtarea']));
-        $query = "UPDATE tarea SET completado = 1 WHERE idtarea = :idtarea AND idusuario = :idusuario";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':idtarea', $idtarea);
-        $stmt->bindParam(':idusuario', $idusuario);
-        $stmt->execute();
-    } elseif (isset($_POST['eliminar_tarea'])) {
-        $idtarea = htmlspecialchars(strip_tags($_POST['idtarea']));
-        $query = "DELETE FROM tarea WHERE idtarea = :idtarea AND idusuario = :idusuario";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':idtarea', $idtarea);
-        $stmt->bindParam(':idusuario', $idusuario);
-        $stmt->execute();
-    }
+    $message = "Gracias, dentro de poco te contestarán un especialista";
 }
-
-$query = "SELECT * FROM tarea WHERE idusuario = :idusuario";
-$stmt = $db->prepare($query);
-$stmt->bindParam(':idusuario', $idusuario);
-$stmt->execute();
-$tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +16,7 @@ $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Mis Tareas - QuickStart Bootstrap Template</title>
+  <title>Contactar Especialista - QuickStart Bootstrap Template</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -72,59 +40,57 @@ $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <link href="assets/css/main.css" rel="stylesheet">
 
   <style>
-    .listar-tareas {
+    .contact-form {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       padding: 50px 0;
     }
-    .listar-tareas .container {
+    .contact-form .container {
       background: #fff;
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
     }
-    .listar-tareas h2 {
+    .contact-form h2 {
+      width: 100%;
       margin-bottom: 30px;
       font-size: 24px;
       font-weight: 700;
       color: #333;
+      text-align: center;
     }
-    .listar-tareas table {
+    .contact-form .form-container {
+      flex: 1;
+      min-width: 300px;
+      margin-right: 20px;
+    }
+    .contact-form .form-group {
+      margin-bottom: 15px;
       width: 100%;
-      border-collapse: collapse;
     }
-    .listar-tareas th, .listar-tareas td {
-      padding: 12px 15px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-    .listar-tareas th {
-      background-color: #f8f9fa;
+    .contact-form .form-group label {
+      display: block;
+      margin-bottom: 5px;
       font-weight: 600;
     }
-    .listar-tareas tr:hover {
-      background-color: #f1f1f1;
-    }
-    .listar-tareas .btn-completar, .listar-tareas .btn-eliminar {
-      background-color: #28a745;
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
+    .contact-form .form-group input,
+    .contact-form .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
       border-radius: 5px;
     }
-    .listar-tareas .btn-completar:hover, .listar-tareas .btn-eliminar:hover {
-      background-color: #218838;
+    .contact-form .form-group textarea {
+      resize: vertical;
     }
-    .listar-tareas .btn-eliminar {
-      background-color: #dc3545;
-    }
-    .listar-tareas .btn-eliminar:hover {
-      background-color: #c82333;
-    }
-    .btn-crear-tarea {
+    .contact-form .btn-submit {
       background-color: #007bff;
       color: #fff;
       border: none;
@@ -133,15 +99,31 @@ $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
       border-radius: 5px;
       margin-top: 20px;
     }
-    .btn-crear-tarea:hover {
+    .contact-form .btn-submit:hover {
       background-color: #0056b3;
+    }
+    .contact-form .message {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #28a745;
+      width: 100%;
+      text-align: center;
+    }
+    .contact-form .image-container {
+      flex: 1;
+      max-width: 400px;
+      margin-left: 20px;
+    }
+    .contact-form .image-container img {
+      width: 100%;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body class="index-page">
 
-<header id="header" class="header d-flex align-items-center fixed-top">
+  <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="container-fluid container-xl position-relative d-flex align-items-center">
 
       <a href="index_li.php" class="logo d-flex align-items-center me-auto">
@@ -163,51 +145,37 @@ $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <main class="main">
 
-    <!-- Listar Tareas Section -->
-    <section id="listar-tareas" class="listar-tareas section">
+    <!-- Contact Form Section -->
+    <section id="contact-form" class="contact-form section">
       <div class="container">
-        <h2 class="text-center">Mis Tareas</h2>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Duración (minutos)</th>
-              <th>Tipo</th>
-              <th>Límite</th>
-              <th>Completado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($tareas as $tarea): ?>
-              <tr>
-                <td><?php echo htmlspecialchars($tarea['nombre']); ?></td>
-                <td><?php echo htmlspecialchars($tarea['duracion']); ?></td>
-                <td><?php echo htmlspecialchars($tarea['tipo']); ?></td>
-                <td><?php echo htmlspecialchars($tarea['limite']); ?></td>
-                <td><?php echo $tarea['completado'] ? 'Sí' : 'No'; ?></td>
-                <td>
-                  <?php if (!$tarea['completado']): ?>
-                    <form action="tareas.php" method="post" style="display:inline;">
-                      <input type="hidden" name="idtarea" value="<?php echo $tarea['idtarea']; ?>">
-                      <button type="submit" name="completar_tarea" class="btn-completar">Marcar como completado</button>
-                    </form>
-                  <?php else: ?>
-                    <form action="tareas.php" method="post" style="display:inline;">
-                      <input type="hidden" name="idtarea" value="<?php echo $tarea['idtarea']; ?>">
-                      <button type="submit" name="eliminar_tarea" class="btn-eliminar">Eliminar</button>
-                    </form>
-                  <?php endif; ?>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-        <div class="text-center">
-          <a href="creartarea.php" class="btn-crear-tarea">Crear Tarea</a>
+        <h2 class="text-center">Contactar Especialista</h2>
+        <div class="form-container">
+          <form action="especialistas.php" method="post">
+            <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input type="text" name="nombre" id="nombre" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Correo Electrónico</label>
+              <input type="email" name="email" id="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="mensaje">Mensaje</label>
+              <textarea name="mensaje" id="mensaje" class="form-control" rows="5" required></textarea>
+            </div>
+            <div class="form-group text-center">
+              <button type="submit" class="btn-submit">Enviar</button>
+            </div>
+          </form>
+          <?php if (isset($message)): ?>
+            <div class="message text-center"><?php echo $message; ?></div>
+          <?php endif; ?>
+        </div>
+        <div class="image-container">
+          <img src="https://kdahweb-static.kokilabenhospital.com/kdah-2019/shop/package/images/16225531190.jpg" alt="Especialista">
         </div>
       </div>
-    </section><!-- /Listar Tareas Section -->
+    </section><!-- /Contact Form Section -->
 
   </main>
 
