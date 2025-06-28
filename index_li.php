@@ -150,7 +150,7 @@ if (!isset($_SESSION['nombre'])) {
             <div class="service-item item-indigo position-relative">
               <i class="bi bi-easel icon"></i>
               <div>
-                <h3>Velit Doloremque.</h3>
+                <h3>Herramienta en proceso!</h3>
                 <p>Cumque et suscipit saepe. Est maiores autem enim facilis ut aut ipsam corporis aut. Sed animi at autem alias eius labore.</p>
                 <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
               </div>
@@ -161,7 +161,7 @@ if (!isset($_SESSION['nombre'])) {
             <div class="service-item item-pink position-relative">
               <i class="bi bi-chat-square-text icon"></i>
               <div>
-                <h3>Dolori Architecto</h3>
+                <h3>herramienta en proceso!</h3>
                 <p>Hic molestias ea quibusdam eos. Fugiat enim doloremque aut neque non et debitis iure. Corrupti recusandae ducimus enim.</p>
                 <a href="#" class="read-more stretched-link">Learn More <i class="bi bi-arrow-right"></i></a>
               </div>
