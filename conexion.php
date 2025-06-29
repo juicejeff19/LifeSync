@@ -1,5 +1,17 @@
 <?php
-class Database {
+//Get Heroku ClearDB connection information
+$jawsdb_url = parse_url(getenv("JAWSDB_URL"));
+$cleardb_server = $jawsdb_url["host"];
+$cleardb_username = $jawsdb_url["user"];
+$cleardb_password = $jawsdb_url["pass"];
+$cleardb_db = substr($jawsdb_url["path"],1);
+$active_group = 'default';
+$query_builder = TRUE;
+// Connect to DB
+$conn = mysqli_connect($cleardb_server, $cleardb_username, $cleardb_password, $cleardb_db);
+
+
+/*class Database {
     private $host = "localhost";
     private $db_name = "lfdb";
     private $username = "root";
@@ -19,5 +31,5 @@ class Database {
 
         return $this->conn;
     }
-}
+}*/
 ?>
