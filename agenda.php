@@ -127,13 +127,13 @@ foreach ($tareas as $tarea) {
         <table class="agenda-table">
           <thead>
             <tr>
+              <th>Domingo</th>
               <th>Lunes</th>
               <th>Martes</th>
-              <th>Miércoles</th>
+              <th>Miercoles</th>
               <th>Jueves</th>
               <th>Viernes</th>
               <th>Sábado</th>
-              <th>Domingo</th>
             </tr>
           </thead>
           <tbody>
